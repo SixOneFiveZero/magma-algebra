@@ -25,3 +25,20 @@ pub trait Group: Monoid + Neg<Output = Self> + Sub<Output = Self>{
         self - rhs
     }
 }
+
+
+pub fn is_associative<T: Semigroup + Clone + PartialEq>(a: T, b: T, c: T) -> bool {
+    let left = a.clone().op(b.clone().op(c.clone()));
+    let right: T = (a.clone().op(b.clone())).op(c.clone());
+    left == right
+} 
+
+pub fn has_identity<T: Monoid + Clone + PartialEq>(a: T) -> bool {
+    let e = T::identity();
+    a.clone() == a.clone().op(e.clone()) && a.clone() == e.clone().op(a.clone())
+}
+
+pub fn has_inverse<T: Group + Clone +PartialEq>(a: T) -> bool {
+    let inverse: T = -a.clone();
+    T::identity() == a.clone().op(inverse)
+}
