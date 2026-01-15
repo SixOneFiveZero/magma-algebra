@@ -90,13 +90,18 @@ pub fn group(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> p
     wrap_and_impl(item, quote::quote! { Default, Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &["Magma", "Semigroup", "Monoid"])
 }
 
+#[proc_macro_attribute]
+pub fn abeliangroup(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    wrap_and_impl(item, quote::quote! { Default, Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &["Magma", "Semigroup", "Monoid", "Group"])
+}
+
 
 // Internal helper function
 
 fn wrap_and_impl(
     item: proc_macro::TokenStream, 
     derives: proc_macro2::TokenStream,
-    marker_traits: &[&str]
+    marker_traits: &[&str] 
 ) -> proc_macro::TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemStruct);
     let name = &input.ident;
@@ -104,16 +109,15 @@ fn wrap_and_impl(
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     let marker_impls = marker_traits.iter().map(|t| {
-        let trait_ident = quote::format_ident!("{}", t);
+        let trait_path: syn::Path = syn::parse_str(t).expect("Invalid trait path");
         quote::quote! { 
-            impl #impl_generics ::magma_algebra::traits::#trait_ident for #name #ty_generics #where_clause {} 
+            impl #impl_generics crate::#trait_path for #name #ty_generics #where_clause {} 
         }
     });
 
     let expanded = quote::quote! {
         #[derive(#derives)]
         #input
-
         #(#marker_impls)*
     };
     

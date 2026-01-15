@@ -1,11 +1,11 @@
 // Modular Arithmatic under Addition
 
-use crate::traits::Group;
-use magma_macros::{group};
+use crate::{groups::abelian::AbelianGroup};
+use magma_macros::{abeliangroup};
 
 use std::ops::{Add, Sub, Neg};
 
-#[group]
+#[abeliangroup]
 #[derive(Copy)]
 pub struct Z<const N: u64>(u64);
 
@@ -45,4 +45,4 @@ impl<const N: u64> Z<N> {
     }
 }
 
-impl<const N: u64> Group for Z<N> {}
+impl<const N: u64> AbelianGroup for Z<N> {}
