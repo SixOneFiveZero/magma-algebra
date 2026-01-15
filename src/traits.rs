@@ -27,18 +27,21 @@ pub trait Group: Monoid + Neg<Output = Self> + Sub<Output = Self>{
 }
 
 
-pub fn is_associative<T: Semigroup + Clone + PartialEq>(a: T, b: T, c: T) -> bool {
+// Algebraic Law Verification
+pub fn check_associativity<T: Semigroup + Clone + PartialEq + std::fmt::Debug>(a: T, b: T, c: T) {
     let left = a.clone().op(b.clone().op(c.clone()));
     let right: T = (a.clone().op(b.clone())).op(c.clone());
-    left == right
+    assert_eq!(left, right, "Associativity Law Violated")
 } 
 
-pub fn has_identity<T: Monoid + Clone + PartialEq>(a: T) -> bool {
+pub fn check_identity<T: Monoid + Clone + PartialEq + std::fmt::Debug>(a: T) {
     let e = T::identity();
-    a.clone() == a.clone().op(e.clone()) && a.clone() == e.clone().op(a.clone())
+    assert_eq!(a.clone(), a.clone().op(e.clone()), "Right Identity Check Failed");
+    assert_eq!(a.clone(), e.clone().op(a.clone()), "Left Identity Failed");
 }
 
-pub fn has_inverse<T: Group + Clone +PartialEq>(a: T) -> bool {
+pub fn check_inverse<T: Group + Clone +PartialEq + std::fmt::Debug>(a: T) {
     let inverse: T = -a.clone();
-    T::identity() == a.clone().op(inverse)
+    assert_eq!(T::identity(), a.clone().op(inverse.clone()), "Right Inverse Failed");
+    assert_eq!(a.clone().op(inverse.clone()), T::identity(), "Left Inverse Failed");
 }
