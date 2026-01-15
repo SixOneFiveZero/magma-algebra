@@ -40,7 +40,6 @@ pub fn test_type_for_algebraic_laws(
         _ => panic!("The trait {} is not supported by verify_laws", trait_name)
     }
 
-
     let expanded = quote::quote! {
         #input
 
@@ -63,6 +62,54 @@ pub fn test_type_for_algebraic_laws(
         }
     };
 
+    proc_macro::TokenStream::from(expanded)
+}
 
+
+// Macros for required derivations and implementations
+
+#[proc_macro_attribute]
+pub fn magma(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    wrap_and_impl(item, quote::quote! { Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &[])
+}
+
+#[proc_macro_attribute]
+pub fn semigroup(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    wrap_and_impl(item, quote::quote! { Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &["Magma"])
+}
+
+#[proc_macro_attribute]
+pub fn monoid(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    wrap_and_impl(item, quote::quote! { Default, Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &["Magma", "Semigroup"])
+}
+
+#[proc_macro_attribute]
+pub fn group(_attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    wrap_and_impl(item, quote::quote! { Default, Debug, Clone, PartialEq, ::proptest_derive::Arbitrary }, &["Magma", "Semigroup", "Monoid"])
+}
+
+
+// Internal helper function
+
+fn wrap_and_impl(
+    item: proc_macro::TokenStream, 
+    derives: proc_macro2::TokenStream,
+    marker_traits: &[&str]
+) -> proc_macro::TokenStream {
+    let input = syn::parse_macro_input!(item as syn::ItemStruct);
+    let name = &input.ident;
+    
+    let marker_impls = marker_traits.iter().map(|t| {
+        let trait_ident = quote::format_ident!("{}", t);
+        quote::quote! { impl ::magma_algebra::traits::#trait_ident for #name {} }
+    });
+
+    let expanded = quote::quote! {
+        #[derive(#derives)]
+        #input
+
+        #(#marker_impls)*
+    };
+    
     proc_macro::TokenStream::from(expanded)
 }
