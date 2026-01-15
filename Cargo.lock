@@ -85,13 +85,13 @@ checksum = "df1d3c3b53da64cf5760482273a98e575c651a67eec7f77df96b5b642de8f039"
 name = "magma-algebra"
 version = "0.1.0"
 dependencies = [
- "magma_macros",
+ "magma-macros",
  "proptest",
  "proptest-derive",
 ]
 
 [[package]]
-name = "magma_macros"
+name = "magma-macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
