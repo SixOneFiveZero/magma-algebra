@@ -1,11 +1,11 @@
 // Modular Arithmatic under Addition
 
-use crate::{groups::abelian::AbelianGroup};
-use magma_macros::{abeliangroup};
+use magma_algebra::{groups::abelian::AddAbelianGroup};
+use magma_macros::{addabeliangroup};
 
 use std::ops::{Add, Sub, Neg};
 
-#[abeliangroup]
+#[addabeliangroup]
 #[derive(Copy)]
 pub struct Z<const N: u64>(u64);
 
@@ -45,4 +45,6 @@ impl<const N: u64> Z<N> {
     }
 }
 
-impl<const N: u64> AbelianGroup for Z<N> {}
+impl<const N: u64> AddAbelianGroup for Z<N> {}
+
+// TODO: TESTS FOR ALGEBRAIC LAW VERIFICATION

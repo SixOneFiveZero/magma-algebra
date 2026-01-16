@@ -1,4 +1,5 @@
-use crate::traits::Group;
+use crate::traits::{AddGroup, MultGroup};
 
 // Abelian Group: Group with Commutativity
-pub trait AbelianGroup: Group {}
+pub trait AddAbelianGroup: AddGroup {}
+pub trait MultAbelianGroup: MultGroup {}
